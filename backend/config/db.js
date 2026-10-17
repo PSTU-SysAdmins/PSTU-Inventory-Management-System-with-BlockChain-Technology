@@ -1,14 +1,16 @@
 import mongoose from 'mongoose';
-import { MONGO_URI } from './config.js';
 
 const connectDB = async () => {
+    const uri = process.env.MONGO_URI?.trim();
+    if (!uri) {
+        throw new Error('MONGO_URI is required. Set it in the deployment environment or backend/.env.');
+    }
     try {
-        // Remove deprecated options
-        await mongoose.connect(MONGO_URI);
+        await mongoose.connect(uri);
         console.log('MongoDB connected');
-    } catch (error) {
-        console.error('Error connecting to MongoDB:', error);
-        process.exit(1);
+    } catch {
+        // Driver errors can contain the connection URI and its credentials.
+        throw new Error('MongoDB connection failed. Check MONGO_URI, database credentials, and network access.');
     }
 };
 

@@ -1,7 +1,8 @@
+import "dotenv/config";
 import express from "express";
 import connectDB from "./config/db.js";
 import cors from "cors";
-import dotenv from "dotenv";
+import mongoose from "mongoose";
 import path from "path";
 
 import { 
@@ -25,12 +26,23 @@ import {
 
 import { blockchainRoutes, startBlockchainVerificationJob } from "./block_page.js";
 
-dotenv.config();
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-connectDB();
+try {
+  await connectDB();
+} catch (error) {
+  console.error(error.message);
+  process.exit(1);
+}
+
+app.get("/api/health", (_req, res) => {
+  const connected = mongoose.connection.readyState === 1;
+  res.status(connected ? 200 : 503).json({
+    status: connected ? "ok" : "unavailable",
+    db: connected ? "connected" : "disconnected",
+  });
+});
 
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use(cors());
