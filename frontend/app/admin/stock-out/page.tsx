@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -74,8 +76,6 @@ interface EnrichedStockOutRecord extends StockOutRecord {
   officeName: string
   userRole: string
 }
-
-const API_BASE_URL = "http://localhost:5000"
 
 function DeleteConfirmModal({
   isOpen,
@@ -283,31 +283,31 @@ export default function StockOutPage() {
         setLoading(true)
         setError("")
 
-        const stockOutResponse = await fetch(`${API_BASE_URL}/api/stockouts/get`)
+        const stockOutResponse = await fetch(API_ROUTES.stockouts.list)
         if (!stockOutResponse.ok) {
           throw new Error("Failed to fetch stock out records")
         }
         const stockOutData: StockOutRecord[] = await stockOutResponse.json()
 
-        const usersResponse = await fetch(`${API_BASE_URL}/api/users/get`)
+        const usersResponse = await fetch(API_ROUTES.users.list)
         if (!usersResponse.ok) {
           throw new Error("Failed to fetch users")
         }
         const usersData: User[] = await usersResponse.json()
 
-        const itemsResponse = await fetch(`${API_BASE_URL}/api/items/get`)
+        const itemsResponse = await fetch(API_ROUTES.items.list)
         if (!itemsResponse.ok) {
           throw new Error("Failed to fetch items")
         }
         const itemsData: Item[] = await itemsResponse.json()
 
-        const departmentsResponse = await fetch(`${API_BASE_URL}/api/departments/get`)
+        const departmentsResponse = await fetch(API_ROUTES.departments.list)
         if (!departmentsResponse.ok) {
           throw new Error("Failed to fetch departments")
         }
         const departmentsData: Department[] = await departmentsResponse.json()
 
-        const officesResponse = await fetch(`${API_BASE_URL}/api/offices/get`)
+        const officesResponse = await fetch(API_ROUTES.offices.list)
         if (!officesResponse.ok) {
           throw new Error("Failed to fetch offices")
         }
@@ -357,7 +357,7 @@ export default function StockOutPage() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/users/get`)
+        const response = await fetch(API_ROUTES.users.list)
         if (response.ok) {
           const data = await response.json()
           const userMap: Record<string, string> = {}
@@ -440,13 +440,13 @@ export default function StockOutPage() {
 
     setIsDeleting(true)
     try {
-      const response = await fetch(`${API_BASE_URL}/api/stockouts/delete/${record._id}`, {
+      const response = await fetch(API_ROUTES.stockouts.delete(record._id), {
         method: "DELETE",
       })
 
       if (!response.ok) throw new Error("Failed to delete record")
 
-      await fetch(`${API_BASE_URL}/api/currentstockouts/update-quantity`, {
+      await fetch(API_ROUTES.currentstockouts.updateQuantity, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -456,7 +456,7 @@ export default function StockOutPage() {
         }),
       })
 
-      await fetch(`${API_BASE_URL}/api/currentstockins/update-quantity`, {
+      await fetch(API_ROUTES.currentstockins.updateQuantity, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -487,7 +487,7 @@ export default function StockOutPage() {
       const newQuantity = data.quantity || oldQuantity
       const quantityDifference = newQuantity - oldQuantity
 
-      const response = await fetch(`${API_BASE_URL}/api/stockouts/update/${updateModal.record._id}`, {
+      const response = await fetch(API_ROUTES.stockouts.update(updateModal.record._id), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -496,7 +496,7 @@ export default function StockOutPage() {
       if (!response.ok) throw new Error("Failed to update record")
 
       if (quantityDifference !== 0) {
-        await fetch(`${API_BASE_URL}/api/currentstockouts/update-quantity`, {
+        await fetch(API_ROUTES.currentstockouts.updateQuantity, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -506,7 +506,7 @@ export default function StockOutPage() {
           }),
         })
 
-        await fetch(`${API_BASE_URL}/api/currentstockins/update-quantity`, {
+        await fetch(API_ROUTES.currentstockins.updateQuantity, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

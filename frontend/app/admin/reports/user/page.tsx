@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -73,7 +75,7 @@ export default function UserReport() {
     if (!mounted) return
     const fetchAllUsers = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/users/get")
+        const res = await fetch(API_ROUTES.users.list)
         if (res.ok) {
           const data = await res.json()
           setAllUsers(Array.isArray(data) ? data : [])
@@ -104,14 +106,14 @@ export default function UserReport() {
 
     try {
       // Fetch all items
-      const itemsRes = await fetch("http://localhost:5000/api/items/get")
+      const itemsRes = await fetch(API_ROUTES.items.list)
       if (!itemsRes.ok) throw new Error("Failed to fetch items")
       const allItems = await itemsRes.json()
 
       // Fetch user-specific stock data from three endpoints
-      const stockInRes = await fetch(`http://localhost:5000/api/stockins/user/${user._id}`)
-      const stockOutRes = await fetch(`http://localhost:5000/api/stockouts/user/${user._id}`)
-      const deadStocksRes = await fetch(`http://localhost:5000/api/deadstocks/user/${user._id}`)
+      const stockInRes = await fetch(API_ROUTES.stockins.user(user._id))
+      const stockOutRes = await fetch(API_ROUTES.stockouts.user(user._id))
+      const deadStocksRes = await fetch(API_ROUTES.deadstocks.user(user._id))
 
       let stockInData: Record<string, number> = {}
       let stockOutData: Record<string, number> = {}

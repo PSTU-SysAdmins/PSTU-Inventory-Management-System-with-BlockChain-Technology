@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -25,7 +27,7 @@ import Image from "next/image"
  * - image preview and upload
  * - validation, form submission and error handling
  *
- * Note: API endpoints are currently pointing to http://localhost:5000 — adjust for production.
+ * API endpoints use the shared backend origin.
  */
 
 export default function StockInRequestPage() {
@@ -97,8 +99,8 @@ export default function StockInRequestPage() {
     const fetchProductsAndSuppliers = async () => {
       try {
         const [itemsRes, suppliersRes] = await Promise.all([
-          fetch("http://localhost:5000/api/items/get"),
-          fetch("http://localhost:5000/api/suppliers/get"),
+          fetch(API_ROUTES.items.list),
+          fetch(API_ROUTES.suppliers.list),
         ])
 
         if (itemsRes.ok) {
@@ -325,7 +327,7 @@ export default function StockInRequestPage() {
         imageName: imageFile.name,
       })
 
-      const res = await fetch("http://localhost:5000/api/stockInRequest/create", {
+      const res = await fetch(API_ROUTES.stockInRequest.create, {
         method: "POST",
         body: payload,
       })

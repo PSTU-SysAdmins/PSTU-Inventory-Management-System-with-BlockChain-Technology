@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import type React from "react"
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -81,8 +83,8 @@ export default function CreateDeadstock() {
     const fetchData = async () => {
       try {
         const [usersRes, itemsRes] = await Promise.all([
-          fetch("http://localhost:5000/api/users/get"),
-          fetch("http://localhost:5000/api/items/get"),
+          fetch(API_ROUTES.users.list),
+          fetch(API_ROUTES.items.list),
         ])
 
         if (usersRes.ok) {
@@ -122,7 +124,7 @@ export default function CreateDeadstock() {
     try {
       setLoadingQuantity(true)
       const response = await fetch(
-        `http://localhost:5000/api/currentstockouts/quantity?user_id=${userId}&item_id=${itemId}`,
+        API_ROUTES.currentstockouts.quantity(userId, itemId),
       )
 
       if (!response.ok) {
@@ -212,7 +214,7 @@ export default function CreateDeadstock() {
 
       console.log("Sending deadstock data:", deadstockData)
 
-      const response = await fetch("http://localhost:5000/api/deadstocks/create", {
+      const response = await fetch(API_ROUTES.deadstocks.create, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -247,7 +249,7 @@ export default function CreateDeadstock() {
       }
 
       try {
-        const updateResponse = await fetch("http://localhost:5000/api/currentstockouts/update-quantity", {
+        const updateResponse = await fetch(API_ROUTES.currentstockouts.updateQuantity, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",

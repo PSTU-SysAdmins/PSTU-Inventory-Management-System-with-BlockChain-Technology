@@ -1,18 +1,13 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import { useEffect, useState, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, CheckCircle, Clock, X, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
-
-const API_BASE =
-  typeof window !== "undefined"
-    ? window.location.hostname === "localhost"
-      ? "http://localhost:5000"
-      : ""
-    : "http://localhost:5000"
 
 // ---------- Types ----------
 
@@ -77,7 +72,7 @@ async function fetchItemName(itemId: string): Promise<string> {
     const cleanId = extractId(itemId)
     if (!cleanId) return itemId
 
-    const response = await fetch(`${API_BASE}/api/items/get/${cleanId}`)
+    const response = await fetch(API_ROUTES.items.getById(cleanId))
     if (!response.ok) return cleanId
     const data = await response.json()
     return data.name || data.itemName || cleanId
@@ -91,7 +86,7 @@ async function fetchUserData(userId: string): Promise<{ name: string; email: str
     const cleanId = extractId(userId)
     if (!cleanId) return { name: userId, email: "No email" }
 
-    const response = await fetch(`${API_BASE}/api/users/get/${cleanId}`)
+    const response = await fetch(API_ROUTES.users.getById(cleanId))
     if (!response.ok) return { name: cleanId, email: "No email" }
 
     const data = await response.json()
@@ -133,7 +128,7 @@ function getImageUrl(imageUrl: string) {
   if (!imageUrl) return "/placeholder.svg"
   if (imageUrl.startsWith("http")) return imageUrl
   const filename = imageUrl.split("/").pop() || imageUrl
-  return `${API_BASE}/uploads/${filename}`
+  return API_ROUTES.files.upload(filename)
 }
 
 async function createDeadStockEntry(request: DeadStockRequest) {
@@ -156,7 +151,7 @@ async function createDeadStockEntry(request: DeadStockRequest) {
 
   if (userId && userId !== "system" && (!departmentId || !officeId)) {
     try {
-      const userRes = await fetch(`${API_BASE}/api/users/get/${userId}`)
+      const userRes = await fetch(API_ROUTES.users.getById(userId))
       if (userRes.ok) {
         const userData = await userRes.json()
         const user = userData.data || userData.user || userData
@@ -189,7 +184,7 @@ async function createDeadStockEntry(request: DeadStockRequest) {
 
   console.log("[v0] createDeadStockEntry payload:", payload)
 
-  const res = await fetch(`${API_BASE}/api/deadstocks/create`, {
+  const res = await fetch(API_ROUTES.deadstocks.create, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -431,7 +426,7 @@ export default function DeadStockRequestsPage() {
   async function fetchRequests(showLoading = true) {
     try {
       if (showLoading) setLoading(true)
-      const res = await fetch(`${API_BASE}/api/deadstockrequests/get`)
+      const res = await fetch(API_ROUTES.deadstockrequests.list)
       if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`)
       const data = await res.json()
 
@@ -453,14 +448,14 @@ export default function DeadStockRequestsPage() {
   const onApprove = async (request: DeadStockRequest) => {
     try {
       setIsLoading(true)
-      const approveResponse = await fetch(`${API_BASE}/api/deadstockrequests/approve/${request._id}`, {
+      const approveResponse = await fetch(API_ROUTES.deadstockrequests.approve(request._id), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
       })
 
       if (!approveResponse.ok) throw new Error("Failed to approve request")
 
-      const deadstockResponse = await fetch(`${API_BASE}/api/deadstocks/create`, {
+      const deadstockResponse = await fetch(API_ROUTES.deadstocks.create, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -487,7 +482,7 @@ export default function DeadStockRequestsPage() {
   const onReject = async (request: DeadStockRequest) => {
     try {
       setIsLoading(true)
-      const response = await fetch(`${API_BASE}/api/deadstockrequests/reject/${request._id}`, {
+      const response = await fetch(API_ROUTES.deadstockrequests.reject(request._id), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
       })

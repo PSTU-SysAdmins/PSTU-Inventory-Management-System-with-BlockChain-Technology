@@ -1,6 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { API_ROUTES } from "@/lib/api"
+
+import { Suspense, useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { ChevronUp, ChevronDown, ArrowUpRight, ArrowDownRight, Trash2, RefreshCw, UserIcon } from "lucide-react"
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
@@ -52,18 +54,16 @@ interface Office {
   name: string
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
-
 const API_ENDPOINTS = {
-  getUserById: (userId: string) => `${API_BASE_URL}/api/users/get/${userId}`,
-  getUserStockOuts: (userId: string) => `${API_BASE_URL}/api/stockouts/user/${userId}`,
-  getUserStockIns: (userId: string) => `${API_BASE_URL}/api/stockins/user/${userId}`,
-  getDeadStock: () => `${API_BASE_URL}/api/deadstocks/get`,
-  getAllItems: () => `${API_BASE_URL}/api/items/get`,
-  getAllSuppliers: () => `${API_BASE_URL}/api/suppliers/get`,
-  getAllUsers: () => `${API_BASE_URL}/api/users/get`,
-  getAllDepartments: () => `${API_BASE_URL}/api/departments/get`,
-  getAllOffices: () => `${API_BASE_URL}/api/offices/get`,
+  getUserById: (userId: string) => API_ROUTES.users.getById(userId),
+  getUserStockOuts: (userId: string) => API_ROUTES.stockouts.user(userId),
+  getUserStockIns: (userId: string) => API_ROUTES.stockins.user(userId),
+  getDeadStock: () => API_ROUTES.deadstocks.list,
+  getAllItems: () => API_ROUTES.items.list,
+  getAllSuppliers: () => API_ROUTES.suppliers.list,
+  getAllUsers: () => API_ROUTES.users.list,
+  getAllDepartments: () => API_ROUTES.departments.list,
+  getAllOffices: () => API_ROUTES.offices.list,
 } as const
 
 async function fetchFromAPI(url: string) {
@@ -80,10 +80,22 @@ async function fetchFromAPI(url: string) {
 }
 
 export default function UserDashboard() {
+  return (
+    <Suspense fallback={<p>Loading dashboard...</p>}>
+      <UserDashboardContent />
+    </Suspense>
+  )
+}
+
+function UserDashboardContent() {
   const searchParams = useSearchParams()
   const userIdParam = searchParams.get("id")
 
-  const [userId, setUserId] = useState<string>(userIdParam || localStorage.getItem("userId") || "")
+  const [userId, setUserId] = useState<string>("")
+
+  useEffect(() => {
+    setUserId(userIdParam || localStorage.getItem("userId") || "")
+  }, [userIdParam])
 
   const [user, setUser] = useState<UserData | null>(null)
   const [stockIns, setStockIns] = useState<StockActivity[]>([])
@@ -129,6 +141,7 @@ export default function UserDashboard() {
 
     const loadUserData = async () => {
       try {
+        setLoading(true)
         setError(null)
 
         const [userData, outData, inData, deadData, itemsData, suppliersData, usersData, departmentsData, officesData] =

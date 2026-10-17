@@ -1,5 +1,7 @@
 "use client"
 
+import { SITE_LOGO } from "@/lib/site"
+
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -148,7 +150,7 @@ export function AdminSidebar() {
         <div className="flex items-center space-x-3 mb-3">
           <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-solid border-[#51247a]">
               <img 
-                src="https://pstu.ac.bd/storage/images/images/1704261659_WhatsApp%20Image%202024-01-02%20at%205.46.49%20PM.jpeg" 
+                src={SITE_LOGO}
                 alt="PSTU Logo" 
                 className="w-full h-full object-cover rounded-full"
               />

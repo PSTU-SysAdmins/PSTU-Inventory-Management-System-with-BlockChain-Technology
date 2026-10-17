@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import type React from "react"
 import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -33,7 +35,7 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
     setSuccess("")
 
     try {
-      const response = await fetch("http://localhost:5000/api/users/request-password-otp", {
+      const response = await fetch(API_ROUTES.users.requestPasswordOtp, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -63,7 +65,7 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
     setSuccess("")
 
     try {
-      const response = await fetch("http://localhost:5000/api/users/verify-password-otp", {
+      const response = await fetch(API_ROUTES.users.verifyPasswordOtp, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -105,7 +107,7 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/users/update-password", {
+      const response = await fetch(API_ROUTES.users.updatePassword, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

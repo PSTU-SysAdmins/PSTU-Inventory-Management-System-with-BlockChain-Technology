@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import type React from "react"
 
 import { useState } from "react"
@@ -53,7 +55,7 @@ export default function CreateSupplier() {
 
   try {
     // Sending the form data to the API using fetch
-    const response = await fetch("http://localhost:5000/api/suppliers/create", {
+    const response = await fetch(API_ROUTES.suppliers.create, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

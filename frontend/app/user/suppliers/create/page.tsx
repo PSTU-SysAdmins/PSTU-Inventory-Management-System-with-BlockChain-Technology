@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import type React from "react"
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -52,7 +54,7 @@ export default function CreateSupplierUser() {
     setLoading(true)
 
     try {
-      const res = await fetch("http://localhost:5000/api/suppliers/create", {
+      const res = await fetch(API_ROUTES.suppliers.create, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

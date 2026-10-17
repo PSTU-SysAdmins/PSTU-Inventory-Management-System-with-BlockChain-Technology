@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import type React from "react"
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -51,7 +53,7 @@ export default function CreateUser() {
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/departments/get")
+        const response = await fetch(API_ROUTES.departments.list)
         if (!response.ok) {
           throw new Error("Failed to fetch departments")
         }
@@ -71,7 +73,7 @@ export default function CreateUser() {
 
     const fetchOffices = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/offices/get")
+        const response = await fetch(API_ROUTES.offices.list)
         if (!response.ok) {
           throw new Error("Failed to fetch offices")
         }
@@ -129,7 +131,7 @@ export default function CreateUser() {
     setLoading(true)
 
     try {
-      const response = await fetch("http://localhost:5000/api/users/create", {
+      const response = await fetch(API_ROUTES.users.create, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

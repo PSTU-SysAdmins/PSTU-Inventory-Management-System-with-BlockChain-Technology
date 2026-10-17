@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -92,7 +94,7 @@ export default function BlockchainVerification() {
     }
 
     try {
-      const endpoint = `http://localhost:5000/api/${type}s/get/${id}`
+      const endpoint = API_ROUTES.records.getByType(type, id)
       const response = await fetch(endpoint)
 
       if (response.ok) {
@@ -157,7 +159,7 @@ export default function BlockchainVerification() {
     setVerificationResult(null)
 
     try {
-      const stockInResponse = await fetch(`http://localhost:5000/api/stockins/get/${stockInId}`)
+      const stockInResponse = await fetch(API_ROUTES.stockins.getById(stockInId))
       if (!stockInResponse.ok) {
         throw new Error("StockIn request not found")
       }
@@ -166,7 +168,7 @@ export default function BlockchainVerification() {
       const enhancedData = await enhancedStockInData(stockIn)
       setStockInData(enhancedData)
 
-      const blockchainResponse = await fetch(`http://localhost:5000/api/blockchain/audit/${stockInId}`)
+      const blockchainResponse = await fetch(API_ROUTES.blockchain.audit(stockInId))
       if (!blockchainResponse.ok) {
         throw new Error("No blockchain audit trail found for this StockIn ID")
       }

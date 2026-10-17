@@ -1,5 +1,9 @@
 "use client"
 
+import { SITE_LOGO } from "@/lib/site"
+
+import { API_ROUTES } from "@/lib/api"
+
 import type React from "react"
 
 import { useState } from "react"
@@ -27,7 +31,7 @@ export default function LoginPage() {
 
     try {
       // Make the POST request to your backend API
-      const response = await fetch("http://localhost:5000/api/users/login", {
+      const response = await fetch(API_ROUTES.users.login, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -89,7 +93,7 @@ export default function LoginPage() {
               <div className="flex justify-center items-center">
                 <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-solid border-[#51247a]">
                   <img
-                    src="https://pstu.ac.bd/storage/images/images/1704261659_WhatsApp%20Image%202024-01-02%20at%205.46.49%20PM.jpeg"
+                    src={SITE_LOGO}
                     alt="PSTU Logo"
                     className="w-full h-full object-cover rounded-full"
                   />

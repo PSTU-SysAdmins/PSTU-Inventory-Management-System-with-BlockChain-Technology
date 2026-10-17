@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -61,7 +63,7 @@ export default function InventoryTotalReport() {
   const fetchCategoryName = async (categoryId: string): Promise<string> => {
     try {
       if (!categoryId || !/^[0-9a-fA-F]{24}$/.test(categoryId)) return "N/A"
-      const res = await fetch(`http://localhost:5000/api/categories/get/${categoryId}`)
+      const res = await fetch(API_ROUTES.categories.getById(categoryId))
       if (!res.ok) return "N/A"
       const category: Category = await res.json()
       return category.name || "N/A"
@@ -72,13 +74,13 @@ export default function InventoryTotalReport() {
 
   const fetchStockStats = async (productId: string) => {
     try {
-      const stockInRes = await fetch(`http://localhost:5000/api/stockins/item/${productId}`)
+      const stockInRes = await fetch(API_ROUTES.stockins.item(productId))
       const stockInData = stockInRes.ok ? await stockInRes.json() : null
 
-      const stockOutRes = await fetch(`http://localhost:5000/api/stockouts/item/${productId}`)
+      const stockOutRes = await fetch(API_ROUTES.stockouts.item(productId))
       const stockOutData = stockOutRes.ok ? await stockOutRes.json() : null
 
-      const deadStockRes = await fetch(`http://localhost:5000/api/deadstocks/item/${productId}`)
+      const deadStockRes = await fetch(API_ROUTES.deadstocks.item(productId))
       const deadStockData = deadStockRes.ok ? await deadStockRes.json() : null
 
       const stockIn = getQuantitySum(stockInData)
@@ -130,7 +132,7 @@ export default function InventoryTotalReport() {
   }
 
   const fetchInventoryData = async (signal?: AbortSignal): Promise<InventoryItem[]> => {
-    const res = await fetch("http://localhost:5000/api/items/get", { signal })
+    const res = await fetch(API_ROUTES.items.list, { signal })
     if (!res.ok) throw new Error(await res.text())
     const items = await res.json()
 

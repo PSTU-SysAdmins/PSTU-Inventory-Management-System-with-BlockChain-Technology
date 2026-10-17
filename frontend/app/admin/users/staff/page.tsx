@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -75,13 +77,13 @@ export default function StaffPage() {
         setLoading(true)
         setError("")
 
-        const staffResponse = await fetch("http://localhost:5000/api/users/get-staff")
+        const staffResponse = await fetch(API_ROUTES.users.getStaff)
         if (!staffResponse.ok) {
           throw new Error("Failed to fetch staff")
         }
         const staffData: Staff[] = await staffResponse.json()
 
-        const officesResponse = await fetch("http://localhost:5000/api/offices/get")
+        const officesResponse = await fetch(API_ROUTES.offices.list)
         if (!officesResponse.ok) {
           throw new Error("Failed to fetch offices")
         }
@@ -162,7 +164,7 @@ export default function StaffPage() {
 
     try {
       setEditLoading(true)
-      const response = await fetch(`http://localhost:5000/api/users/update/${editingStaff._id}`, {
+      const response = await fetch(API_ROUTES.users.update(editingStaff._id), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -195,7 +197,7 @@ export default function StaffPage() {
 
     try {
       setDeleteLoading(id)
-      const response = await fetch(`http://localhost:5000/api/users/delete/${id}`, {
+      const response = await fetch(API_ROUTES.users.delete(id), {
         method: "DELETE",
       })
 

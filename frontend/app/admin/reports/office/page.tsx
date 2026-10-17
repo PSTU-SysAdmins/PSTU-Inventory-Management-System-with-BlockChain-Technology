@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -73,7 +75,7 @@ export default function OfficeReport() {
     if (!mounted) return
     const fetchAllOffices = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/offices/get")
+        const res = await fetch(API_ROUTES.offices.list)
         if (res.ok) {
           const data = await res.json()
           setAllOffices(Array.isArray(data) ? data : [])
@@ -107,13 +109,13 @@ export default function OfficeReport() {
     setShowSuggestions(false)
 
     try {
-      const itemsRes = await fetch("http://localhost:5000/api/items/get")
+      const itemsRes = await fetch(API_ROUTES.items.list)
       if (!itemsRes.ok) throw new Error("Failed to fetch items")
       const allItems = await itemsRes.json()
 
-      const stockInRes = await fetch(`http://localhost:5000/api/stockins/office/${office._id}`)
-      const stockOutRes = await fetch(`http://localhost:5000/api/stockouts/office/${office._id}`)
-      const deadStocksRes = await fetch(`http://localhost:5000/api/deadstocks/office/${office._id}`)
+      const stockInRes = await fetch(API_ROUTES.stockins.office(office._id))
+      const stockOutRes = await fetch(API_ROUTES.stockouts.office(office._id))
+      const deadStocksRes = await fetch(API_ROUTES.deadstocks.office(office._id))
 
       let stockInData: Record<string, number> = {}
       let stockOutData: Record<string, number> = {}

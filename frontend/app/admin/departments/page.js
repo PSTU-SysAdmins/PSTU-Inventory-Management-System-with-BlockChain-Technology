@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -27,7 +29,7 @@ export default function DepartmentsPage() {
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false)
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/departments/get")
+    fetch(API_ROUTES.departments.list)
       .then((response) => response.json())
       .then((data) => {
         setDepartments(data)
@@ -75,7 +77,7 @@ export default function DepartmentsPage() {
 
     setIsLoadingUpdate(true)
     try {
-      const response = await fetch(`http://localhost:5000/api/departments/update/${selectedDepartment._id}`, {
+      const response = await fetch(API_ROUTES.departments.update(selectedDepartment._id), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -111,7 +113,7 @@ export default function DepartmentsPage() {
   }
 
   const handleDelete = (id) => {
-    fetch(`http://localhost:5000/api/departments/delete/${id}`, {
+    fetch(API_ROUTES.departments.delete(id), {
       method: "DELETE",
     })
       .then((response) => response.json())

@@ -1,18 +1,13 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import { useEffect, useState, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, CheckCircle, Clock, X, User, Package } from "lucide-react"
 import { Button } from "@/components/ui/button"
-
-const API_BASE =
-  typeof window !== "undefined"
-    ? window.location.hostname === "localhost"
-      ? (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000")
-      : (process.env.NEXT_PUBLIC_API_URL || "")
-    : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000")
 
 // ---------- Types ----------
 
@@ -98,7 +93,7 @@ async function fetchUserData(userId: string): Promise<{ name: string; email: str
     const cleanId = extractId(userId)
     if (!cleanId) return { name: userId, email: "No email" }
 
-    const response = await fetch(`${API_BASE}/api/users/get/${cleanId}`)
+    const response = await fetch(API_ROUTES.users.getById(cleanId))
     if (!response.ok) return { name: cleanId, email: "No email" }
 
     const data: UserData = await response.json()
@@ -118,7 +113,7 @@ async function fetchItemName(itemId: string): Promise<string> {
     const cleanId = extractId(itemId)
     if (!cleanId) return itemId
 
-    const response = await fetch(`${API_BASE}/api/items/get/${cleanId}`)
+    const response = await fetch(API_ROUTES.items.getById(cleanId))
     if (!response.ok) return cleanId
     const data = await response.json()
     return data.name || data.itemName || cleanId
@@ -132,7 +127,7 @@ async function fetchSupplierName(supplierId: string): Promise<string> {
     const cleanId = extractId(supplierId)
     if (!cleanId) return supplierId
 
-    const response = await fetch(`${API_BASE}/api/suppliers/get/${cleanId}`)
+    const response = await fetch(API_ROUTES.suppliers.getById(cleanId))
     if (!response.ok) return cleanId
     const data = await response.json()
     return data.name || data.supplierName || cleanId
@@ -178,7 +173,7 @@ function getImageUrl(imageUrl: string) {
   if (!imageUrl) return "/placeholder.svg"
   if (imageUrl.startsWith("http")) return imageUrl
   const filename = imageUrl.split("/").pop() || imageUrl
-  return `${API_BASE}/uploads/${filename}`
+  return API_ROUTES.files.upload(filename)
 }
 
 async function createStockInEntry(request: StockRequest, formData?: any) {
@@ -221,7 +216,7 @@ async function createStockInEntry(request: StockRequest, formData?: any) {
 
   if (userId && userId !== "system" && (!departmentId || !officeId)) {
     try {
-      const userRes = await fetch(`${API_BASE}/api/users/get/${userId}`)
+      const userRes = await fetch(API_ROUTES.users.getById(userId))
       if (userRes.ok) {
         const userData = await userRes.json()
         const user = userData.data || userData.user || userData
@@ -263,7 +258,7 @@ async function createStockInEntry(request: StockRequest, formData?: any) {
 
   console.log("createStockInEntry payload:", payload)
 
-  const res = await fetch(`${API_BASE}/api/stockins/create`, {
+  const res = await fetch(API_ROUTES.stockins.create, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -369,7 +364,7 @@ export default function StockRequestsPage() {
   async function fetchRequests(showLoading = true) {
     try {
       if (showLoading) setLoading(true)
-      const res = await fetch(`${API_BASE}/api/stockInRequest/get`)
+      const res = await fetch(API_ROUTES.stockInRequest.list)
       if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`)
       const data = await res.json()
 
@@ -407,7 +402,7 @@ export default function StockRequestsPage() {
     try {
       const { invoiceNo } = await createStockInEntry(request)
 
-      const res = await fetch(`${API_BASE}/api/stockInRequest/update/${request._id}`, {
+      const res = await fetch(API_ROUTES.stockInRequest.update(request._id), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -445,7 +440,7 @@ export default function StockRequestsPage() {
   async function onReject(request: StockRequest) {
     setRejectingId(request._id)
     try {
-      const res = await fetch(`${API_BASE}/api/stockInRequest/update/${request._id}`, {
+      const res = await fetch(API_ROUTES.stockInRequest.update(request._id), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "rejected", reviewedByName: "Admin", adminNote: "Rejected by admin" }),

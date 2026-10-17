@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -80,8 +82,6 @@ export default function DeadstockPage() {
   })
   const [updating, setUpdating] = useState(false)
 
-  const API_BASE_URL = "http://localhost:5000"
-
   // Fetch all required data
   useEffect(() => {
     const fetchData = async () => {
@@ -90,21 +90,21 @@ export default function DeadstockPage() {
         setError("")
 
         // Fetch deadstock records
-        const deadstockResponse = await fetch(`${API_BASE_URL}/api/deadstocks/get`)
+        const deadstockResponse = await fetch(API_ROUTES.deadstocks.list)
         if (!deadstockResponse.ok) {
           throw new Error("Failed to fetch deadstock records")
         }
         const deadstockData: DeadstockRecord[] = await deadstockResponse.json()
 
         // Fetch users
-        const usersResponse = await fetch(`${API_BASE_URL}/api/users/get`)
+        const usersResponse = await fetch(API_ROUTES.users.list)
         if (!usersResponse.ok) {
           throw new Error("Failed to fetch users")
         }
         const usersData: User[] = await usersResponse.json()
 
         // Fetch items
-        const itemsResponse = await fetch(`${API_BASE_URL}/api/items/get`)
+        const itemsResponse = await fetch(API_ROUTES.items.list)
         if (!itemsResponse.ok) {
           throw new Error("Failed to fetch items")
         }
@@ -236,12 +236,12 @@ export default function DeadstockPage() {
 
     try {
       setUpdating(true)
-      const deleteResponse = await fetch(`${API_BASE_URL}/api/deadstocks/delete/${record._id}`, {
+      const deleteResponse = await fetch(API_ROUTES.deadstocks.delete(record._id), {
         method: "DELETE",
       })
 
       if (deleteResponse.ok) {
-        await fetch(`${API_BASE_URL}/api/currentstockouts/update-quantity`, {
+        await fetch(API_ROUTES.currentstockouts.updateQuantity, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -269,7 +269,7 @@ export default function DeadstockPage() {
 
     try {
       setUpdating(true)
-      const updateResponse = await fetch(`${API_BASE_URL}/api/deadstocks/update/${editingRecord._id}`, {
+      const updateResponse = await fetch(API_ROUTES.deadstocks.update(editingRecord._id), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -280,7 +280,7 @@ export default function DeadstockPage() {
 
         const quantityDifference = formData.quantity - editingRecord.quantity
         if (quantityDifference !== 0) {
-          await fetch(`${API_BASE_URL}/api/currentstockouts/update-quantity`, {
+          await fetch(API_ROUTES.currentstockouts.updateQuantity, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

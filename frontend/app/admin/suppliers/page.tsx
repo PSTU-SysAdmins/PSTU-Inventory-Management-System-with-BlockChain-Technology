@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -17,7 +19,7 @@ export default function SuppliersPage() {
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/suppliers/get")
+        const response = await fetch(API_ROUTES.suppliers.list)
         if (!response.ok) {
           throw new Error("Failed to fetch suppliers")
         }

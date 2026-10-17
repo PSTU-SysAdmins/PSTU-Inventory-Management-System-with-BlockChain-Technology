@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -74,13 +76,13 @@ export default function TeachersPage() {
         setLoading(true)
         setError("")
 
-        const teachersResponse = await fetch("http://localhost:5000/api/users/get-teachers")
+        const teachersResponse = await fetch(API_ROUTES.users.getTeachers)
         if (!teachersResponse.ok) {
           throw new Error("Failed to fetch teachers")
         }
         const teachersData: Teacher[] = await teachersResponse.json()
 
-        const departmentsResponse = await fetch("http://localhost:5000/api/departments/get")
+        const departmentsResponse = await fetch(API_ROUTES.departments.list)
         if (!departmentsResponse.ok) {
           throw new Error("Failed to fetch departments")
         }
@@ -162,7 +164,7 @@ export default function TeachersPage() {
 
     try {
       setUpdateLoading(true)
-      const response = await fetch(`http://localhost:5000/api/users/update/${selectedTeacher._id}`, {
+      const response = await fetch(API_ROUTES.users.update(selectedTeacher._id), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -217,7 +219,7 @@ export default function TeachersPage() {
 
     try {
       setDeleteLoading(id)
-      const response = await fetch(`http://localhost:5000/api/users/delete/${id}`, {
+      const response = await fetch(API_ROUTES.users.delete(id), {
         method: "DELETE",
       })
 

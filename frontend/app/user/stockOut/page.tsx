@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import { useState, useEffect } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -32,7 +34,7 @@ export default function MyStockOutPage() {
           return
         }
 
-        const response = await fetch(`http://localhost:5000/api/stockouts/user/${userId}`)
+        const response = await fetch(API_ROUTES.stockouts.user(userId))
 
         if (!response.ok) {
           throw new Error("Failed to fetch stock outs")
@@ -45,7 +47,7 @@ export default function MyStockOutPage() {
         const enrichedStockOuts = await Promise.all(
           stockOutsArray.map(async (stockOut: any) => {
             try {
-              const productResponse = await fetch(`http://localhost:5000/api/items/get/${stockOut.item_id}`)
+              const productResponse = await fetch(API_ROUTES.items.getById(stockOut.item_id))
               if (productResponse.ok) {
                 const product = await productResponse.json()
                 return {

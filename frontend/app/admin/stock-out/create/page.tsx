@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -75,7 +77,7 @@ function UserDropdown({ value, onChange, onUserSelect, placeholder = "Search by 
     const fetchUsers = async () => {
       try {
         setLoading(true)
-        const response = await fetch("http://localhost:5000/api/users/get")
+        const response = await fetch(API_ROUTES.users.list)
         if (response.ok) {
           const data = await response.json()
           setUsers(Array.isArray(data) ? data : [])
@@ -197,7 +199,7 @@ function ItemDropdown({ value, onChange, placeholder = "Search by item name", er
     const fetchItems = async () => {
       try {
         setLoading(true)
-        const response = await fetch("http://localhost:5000/api/items/get")
+        const response = await fetch(API_ROUTES.items.list)
         if (response.ok) {
           const data = await response.json()
           setItems(Array.isArray(data) ? data : [])
@@ -348,7 +350,7 @@ export default function CreateStockOut() {
         setLoadingStockIn(true)
 
         // Fetch stock in records from the stockins API
-        const stockInResponse = await fetch("http://localhost:5000/api/stockins/get")
+        const stockInResponse = await fetch(API_ROUTES.stockins.list)
         if (!stockInResponse.ok) {
           throw new Error(`HTTP error! status: ${stockInResponse.status}`)
         }
@@ -383,7 +385,7 @@ export default function CreateStockOut() {
     try {
       setLoadingUser(true)
       setUserNotFound(false)
-      const response = await fetch(`http://localhost:5000/api/users/get/${userId}`)
+      const response = await fetch(API_ROUTES.users.getById(userId))
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -451,7 +453,7 @@ export default function CreateStockOut() {
 
   const checkServerConnection = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/stockins/get", {
+      const response = await fetch(API_ROUTES.stockins.list, {
         method: "HEAD",
       })
       return response.ok
@@ -470,7 +472,7 @@ export default function CreateStockOut() {
     const serverOnline = await checkServerConnection()
     if (!serverOnline) {
       setErrors({
-        submit: "Cannot connect to server. Please check if the backend server is running on http://localhost:5000",
+        submit: "Cannot connect to the server. Please try again shortly.",
       })
       return
     }
@@ -507,7 +509,7 @@ export default function CreateStockOut() {
 
         console.log("Sending stock out data:", stockOutData)
 
-        const response = await fetch("http://localhost:5000/api/stockouts/create", {
+        const response = await fetch(API_ROUTES.stockouts.create, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -562,7 +564,7 @@ export default function CreateStockOut() {
   console.log("Sending current stock-out:", bodyData)
 
   try {
-    const response = await fetch("http://localhost:5000/api/currentstockouts/create", {
+    const response = await fetch(API_ROUTES.currentstockouts.create, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -587,7 +589,7 @@ export default function CreateStockOut() {
       await Promise.all(currentStockOutPromises)
       // Update available quantity after successful stock out
       const updateQuantityPromises = issueItems.map((item) =>
-        fetch("http://localhost:5000/api/currentstockins/update-quantity", {
+        fetch(API_ROUTES.currentstockins.updateQuantity, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -678,7 +680,7 @@ export default function CreateStockOut() {
   const fetchAvailableQuantity = async (itemId: string, issuedByUserId: string) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/currentstockins/quantity?user_id=${issuedByUserId}&item_id=${itemId}`,
+        API_ROUTES.currentstockins.quantity(issuedByUserId, itemId),
       )
 
       if (response.ok) {

@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import type React from "react"
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -95,7 +97,7 @@ export default function CreateStockIn() {
     const fetchSuppliers = async () => {
       try {
         setLoadingSuppliers(true)
-        const response = await fetch("http://localhost:5000/api/suppliers/get")
+        const response = await fetch(API_ROUTES.suppliers.list)
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
@@ -119,7 +121,7 @@ export default function CreateStockIn() {
     const fetchItems = async () => {
       try {
         setLoadingItems(true)
-        const response = await fetch("http://localhost:5000/api/items/get")
+        const response = await fetch(API_ROUTES.items.list)
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
@@ -143,7 +145,7 @@ export default function CreateStockIn() {
     const fetchUsers = async () => {
       try {
         setLoadingUsers(true)
-        const response = await fetch("http://localhost:5000/api/users/get")
+        const response = await fetch(API_ROUTES.users.list)
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
@@ -173,7 +175,7 @@ export default function CreateStockIn() {
     try {
       setLoadingUser(true)
       setUserNotFound(false)
-      const response = await fetch(`http://localhost:5000/api/users/get/${userId}`)
+      const response = await fetch(API_ROUTES.users.getById(userId))
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -247,7 +249,7 @@ export default function CreateStockIn() {
 
   const checkServerConnection = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/suppliers/get", {
+      const response = await fetch(API_ROUTES.suppliers.list, {
         method: "HEAD",
       })
       return response.ok
@@ -264,7 +266,7 @@ export default function CreateStockIn() {
     const serverOnline = await checkServerConnection()
     if (!serverOnline) {
       setErrors({
-        submit: "Cannot connect to server. Please check if the backend server is running on http://localhost:5000",
+        submit: "Cannot connect to the server. Please try again shortly.",
       })
       return
     }
@@ -293,7 +295,7 @@ export default function CreateStockIn() {
       console.log("Starting StockIn API requests...")
       const stockInPromises = stockPayloads.map(async (item) => {
         console.log("Sending StockIn data:", item)
-        const res = await fetch("http://localhost:5000/api/stockins/create", {
+        const res = await fetch(API_ROUTES.stockins.create, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(item),
@@ -308,7 +310,7 @@ export default function CreateStockIn() {
       console.log("Starting CurrentStockIn API requests...")
       const currentStockPromises = stockPayloads.map(async (item) => {
         console.log("Sending CurrentStockIn data:", item)
-        const res = await fetch("http://localhost:5000/api/currentstockins/create", {
+        const res = await fetch(API_ROUTES.currentstockins.create, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(item),

@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -60,18 +62,16 @@ interface Office {
   name: string
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
-
 const API_ENDPOINTS = {
-  departments: `${API_BASE_URL}/api/departments/get`,
-  offices: `${API_BASE_URL}/api/offices/get`,
-  suppliers: `${API_BASE_URL}/api/suppliers/get`,
-  items: `${API_BASE_URL}/api/items/get`,
-  stockIns: `${API_BASE_URL}/api/stockins/get`,
-  stockOuts: `${API_BASE_URL}/api/stockouts/get`,
-  deadStocks: `${API_BASE_URL}/api/deadstocks/get`,
-  users: `${API_BASE_URL}/api/users/get`,
-  categories: `${API_BASE_URL}/api/categories/get`,
+  departments: API_ROUTES.departments.list,
+  offices: API_ROUTES.offices.list,
+  suppliers: API_ROUTES.suppliers.list,
+  items: API_ROUTES.items.list,
+  stockIns: API_ROUTES.stockins.list,
+  stockOuts: API_ROUTES.stockouts.list,
+  deadStocks: API_ROUTES.deadstocks.list,
+  users: API_ROUTES.users.list,
+  categories: API_ROUTES.categories.list,
 } as const
 
 async function fetchFromAPI(url: string) {

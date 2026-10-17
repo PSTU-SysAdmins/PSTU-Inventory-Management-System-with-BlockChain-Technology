@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -92,28 +94,28 @@ export default function StockInPage() {
         setError("")
 
         // Fetch stock in records
-        const stockInResponse = await fetch("http://localhost:5000/api/stockins/get")
+        const stockInResponse = await fetch(API_ROUTES.stockins.list)
         if (!stockInResponse.ok) {
           throw new Error("Failed to fetch stock in records")
         }
         const stockInData: StockInRecord[] = await stockInResponse.json()
 
         // Fetch suppliers
-        const suppliersResponse = await fetch("http://localhost:5000/api/suppliers/get")
+        const suppliersResponse = await fetch(API_ROUTES.suppliers.list)
         if (!suppliersResponse.ok) {
           throw new Error("Failed to fetch suppliers")
         }
         const suppliersData: Supplier[] = await suppliersResponse.json()
 
         // Fetch users
-        const usersResponse = await fetch("http://localhost:5000/api/users/get")
+        const usersResponse = await fetch(API_ROUTES.users.list)
         if (!usersResponse.ok) {
           throw new Error("Failed to fetch users")
         }
         const usersData: User[] = await usersResponse.json()
 
         // Fetch products
-        const productsResponse = await fetch("http://localhost:5000/api/items/get")
+        const productsResponse = await fetch(API_ROUTES.items.list)
         if (!productsResponse.ok) {
           throw new Error("Failed to fetch products")
         }
@@ -133,7 +135,7 @@ export default function StockInPage() {
         // Fetch all unique departments at once instead of per-record
         const uniqueDepartmentIds = Array.from(
           new Set(
-            stockInData.filter((r) => r.department_id && r.department_id.trim() !== "").map((r) => r.department_id),
+            stockInData.map((r) => r.department_id).filter((id): id is string => typeof id === "string" && id.trim() !== ""),
           ),
         )
 
@@ -146,7 +148,7 @@ export default function StockInPage() {
             // Fetch all departments in parallel
             const departmentResponses = await Promise.all(
               uniqueDepartmentIds.map((deptId) =>
-                fetch(`http://localhost:5000/api/departments/get/${deptId}`)
+                fetch(API_ROUTES.departments.getById(deptId))
                   .then((res) => ({ deptId, res }))
                   .catch((err) => ({ deptId, error: err })),
               ),
@@ -270,7 +272,7 @@ export default function StockInPage() {
         throw new Error("Record not found")
       }
 
-      const response = await fetch(`http://localhost:5000/api/stockins/delete/${id}`, {
+      const response = await fetch(API_ROUTES.stockins.delete(id), {
         method: "DELETE",
       })
 
@@ -279,7 +281,7 @@ export default function StockInPage() {
       }
 
       try {
-        await fetch("http://localhost:5000/api/currentstockins/update-quantity", {
+        await fetch(API_ROUTES.currentstockins.updateQuantity, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -334,7 +336,7 @@ export default function StockInPage() {
 
     try {
       setUpdateLoading(true)
-      const response = await fetch(`http://localhost:5000/api/stockins/update/${editingRecord._id}`, {
+      const response = await fetch(API_ROUTES.stockins.update(editingRecord._id), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -351,7 +353,7 @@ export default function StockInPage() {
       const quantityDifference = updatedData.quantity - editingRecord.quantity
       if (quantityDifference !== 0) {
         try {
-          await fetch("http://localhost:5000/api/currentstockins/update-quantity", {
+          await fetch(API_ROUTES.currentstockins.updateQuantity, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",

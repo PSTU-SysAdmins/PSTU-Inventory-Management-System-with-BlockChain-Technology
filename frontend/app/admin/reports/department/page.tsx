@@ -1,5 +1,7 @@
 "use client"
 
+import { API_ROUTES } from "@/lib/api"
+
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -73,7 +75,7 @@ export default function DepartmentReport() {
     if (!mounted) return
     const fetchAllDepartments = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/departments/get")
+        const res = await fetch(API_ROUTES.departments.list)
         if (res.ok) {
           const data = await res.json()
           setAllDepartments(Array.isArray(data) ? data : [])
@@ -104,13 +106,13 @@ export default function DepartmentReport() {
 
     try {
       // Fetch all items
-      const itemsRes = await fetch("http://localhost:5000/api/items/get")
+      const itemsRes = await fetch(API_ROUTES.items.list)
       if (!itemsRes.ok) throw new Error("Failed to fetch items")
       const allItems = await itemsRes.json()
 
-      const stockInRes = await fetch(`http://localhost:5000/api/stockins/department/${department._id}`)
-      const stockOutRes = await fetch(`http://localhost:5000/api/stockouts/department/${department._id}`)
-      const deadStocksRes = await fetch(`http://localhost:5000/api/deadstocks/department/${department._id}`)
+      const stockInRes = await fetch(API_ROUTES.stockins.department(department._id))
+      const stockOutRes = await fetch(API_ROUTES.stockouts.department(department._id))
+      const deadStocksRes = await fetch(API_ROUTES.deadstocks.department(department._id))
 
       let stockInData: Record<string, number> = {}
       let stockOutData: Record<string, number> = {}
